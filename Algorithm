@@ -1,0 +1,55 @@
+import numpy as np
+
+Genome_1 = "GCATGCU"
+Genome_2 = "GATTACA"
+penalty = -1
+gap = '-'
+match = 1
+
+Aligned_G1 = list ( )
+Aligned_G2 = list ( )
+
+M = [ [ 0 for x in range ( len ( Genome_1 ) + 1 ) ] for y in range ( len ( Genome_2 ) + 1 ) ]
+
+print ( 'Original sequence:' )
+print ( Genome_1 )
+print ( Genome_2 )
+
+for i in range ( 1 , len ( Genome_1 ) + 1 ):
+    M[ i ][ 0 ] = M[ i - 1 ][ 0 ] + penalty
+
+for j in range ( 1 , len ( Genome_2 ) + 1 ):
+    M[ 0 ][ j ] = M[ 0 ][ j - 1 ] + penalty
+
+    for i in range ( 1 , len ( Genome_1 ) + 1 ):
+        for j in range ( 1 , len ( Genome_2 ) + 1 ):
+            if Genome_2[ i - 1 ] == Genome_1[ j - 1 ]:
+                M[ i ][ j ] = max ( M[ i ][ j - 1 ] + penalty , M[ i - 1 ][ j ] + penalty ,
+                                    M[ i - 1 ][ j - 1 ] + match )
+            else:
+                M[ i ][ j ] = max ( M[ i ][ j - 1 ] + penalty , M[ i - 1 ][ j ] + penalty ,
+                                    M[ i - 1 ][ j - 1 ] + penalty )
+
+print ( 'Alignment Matrix:' )
+print ( np.matrix ( M ) )
+
+m = len ( Genome_1 ) - 1
+k = len ( Genome_2 ) - 1
+
+while (m >= 0) & (k >= 0) :
+    if (M[ m ][ k ] == M[ m - 1 ][ k - 1 ] + match) or (M[ m ][ k ] == M[ m - 1 ][ k - 1 ] + penalty):
+        Aligned_G1.append ( Genome_1[ m ] )
+        Aligned_G2.append ( Genome_2[ m ] )
+        m -= 1
+        k -= 1
+    elif M[ m ][ k ] == M[ m ][ k - 1 ] + penalty:
+        Aligned_G1.append ( Genome_1[ m ] )
+        Aligned_G2.append ( gap )
+        m -= 1
+    elif M[ m ][ k ] == M[ m - 1 ][ k ] + penalty:
+        Aligned_G1.append ( gap )
+        Aligned_G2.append ( Genome_2[ k ] )
+        k -= 1
+
+print ( 'Aligned Genome1' , list ( reversed ( Aligned_G1 ) ) )
+print ( 'Aligned Genome2' , list ( reversed ( Aligned_G2 ) ) )
